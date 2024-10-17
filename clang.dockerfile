@@ -36,7 +36,7 @@ RUN cmake -S llvm-project-${CLANG_VERSION}.src/llvm -B build \
 RUN cmake --build build --parallel $(nproc) --target install \
  && rm -rf build
 
-# base final image off ubi8-micro
+## stage 2: final image
 FROM docker.io/redhat/ubi8
 
 RUN dnf install -y \
@@ -57,7 +57,7 @@ LABEL maintainer="Carl Pearson <me@carlpearson.net>"
 LABEL org.opencontainers.image.title="clang"
 LABEL description="A container with clang and cmake"
 LABEL org.opencontainers.image.description="A container with clang and cmake"
-LABEL org.opencontainers.image.source https://github.com/cwpearson/clang-tidy
+LABEL org.opencontainers.image.source https://github.com/cwpearson/clang
 LABEL org.opencontainers.image.licenses="GPLv3"
 # LABEL version="1.0"
 # LABEL org.opencontainers.image.version="1.0"
