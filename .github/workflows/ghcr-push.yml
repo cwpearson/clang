@@ -12,12 +12,16 @@ on:
       - '**/*.dockerfile'
 
 jobs:
-  build-16:
-    name: Build + Publish 16
+  build-and-deploy:
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
+    strategy:
+      matrix:
+        include:
+          - cmake: "3.25.3"
+            clang: "16.0.6"
 
     steps:
     - uses: actions/checkout@v4
@@ -25,15 +29,18 @@ jobs:
 
     - name: Set Environment
       run: |
-        echo "SLUG=ghcr.io/cwpearson/clang-tidy-16" >> $GITHUB_ENV
-        echo "DATE=$(date +"%Y%m%d")" >> $GITHUB_ENV
+        echo "SLUG=ghcr.io/cwpearson/clang" >> $GITHUB_ENV
 
     - name: Build
       run: |
-        docker build -f clang-tidy-16.dockerfile -t "$SLUG:latest" -t "$SLUG:$DATE" .
+        docker build \
+          --build-arg CMAKE_VERSION=${{ matrix.cmake }} \
+          --build-arg CLANG_VERSION=${{ matrix.clang }} \
+          -f clang.dockerfile \
+          -t "$SLUG:${{ matrix.clang }}-cmake${{ matrix.cmake }}" \
+          .
 
     - name: Publish to GHCR
       run: |
         echo '${{secrets.GHCR_TOKEN}}' | docker login ghcr.io -u cwpearson --password-stdin
-        docker push "$SLUG:latest"
-        docker push "$SLUG:$DATE"
+        docker push "$SLUG:${{ matrix.clang }}-cmake${{ matrix.cmake }}"

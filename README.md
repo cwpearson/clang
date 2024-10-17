@@ -12,8 +12,14 @@ Inside the container, the working directory is /src, we use the volume mount to 
 ## Building the Image Locally
 
 ```bash
-podman build -f clang-tidy-16.dockerfile -t clang-tidy-16:latest
+export CMAKE_VERSION=3.25.3
+export CLANG_VERSION=16.0.6
+podman build -f clang-tidy-16.dockerfile \
+  --build-arg CMAKE_VERSION=${CMAKE_VERSION} --build-arg CLANG_VERSION=${CLANG_VERSION} \
+   -t clang:${CLANG_VERSION}-cmake${CMAKE_VERSION}
 ```
+
+
 
 ## Deploy
 
